@@ -177,23 +177,23 @@ class NewTempEmail:
             self.page.get("https://smailpro.com/temporary-email")
             time.sleep(3)
             
-            # Click 'Create' button to open modal
-            create_btn = self.page.ele('xpath://button[contains(., "Create")]')
+            # Click 'Create' button to open modal (support both EN and VN)
+            create_btn = self.page.ele('xpath://button[contains(., "Create") or contains(., "Tạo") or @title="Create temporary email"]')
             if create_btn:
                 create_btn.click()
                 time.sleep(2)
                 
                 # Click 'Microsoft' email type
-                ms_btn = self.page.ele('xpath://div[contains(text(), "Microsoft")]/parent::button')
-                if not ms_btn: # Try alternative xpath
-                    ms_btn = self.page.ele('xpath://span[text()="Microsoft"]/parent::button')
+                ms_btn = self.page.ele('xpath://div[contains(text(), "Microsoft")]/ancestor::button')
+                if not ms_btn:
+                    ms_btn = self.page.ele('xpath://span[contains(text(), "Microsoft")]/ancestor::button')
                     
                 if ms_btn:
                     ms_btn.click()
                     time.sleep(1)
                     
                 # Click 'Generate' button
-                generate_btn = self.page.ele('xpath://button[contains(., "Generate")]')
+                generate_btn = self.page.ele('xpath://button[contains(., "Generate") or contains(., "Phát sinh") or contains(., "Tạo")]')
                 if generate_btn:
                     generate_btn.click()
                     time.sleep(4)
