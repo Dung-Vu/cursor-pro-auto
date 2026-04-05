@@ -213,30 +213,30 @@ class NewTempEmail:
                     if email:
                         domain = email.split('@')[1]
                         is_blocked = False
-                            if self.blocked_domains:
-                                for blocked in self.blocked_domains:
-                                    if domain == blocked or domain.endswith('.' + blocked):
-                                        is_blocked = True
-                                        break
-                                        
-                            # Also hardcode block for any .pl domains as they are heavily abused
-                            if domain.endswith('.pl') or domain.endswith('.com.br') or domain.endswith('.ru'):
-                                is_blocked = True
+                        if self.blocked_domains:
+                            for blocked in self.blocked_domains:
+                                if domain == blocked or domain.endswith('.' + blocked):
+                                    is_blocked = True
+                                    break
+                                    
+                        # Also hardcode block for any .pl domains as they are heavily abused
+                        if domain.endswith('.pl') or domain.endswith('.com.br') or domain.endswith('.ru'):
+                            is_blocked = True
 
-                            if is_blocked:
-                                if self.translator:
-                                    print(f"{Fore.YELLOW}⚠️ {self.translator.get('email.domain_blocked')}: {domain}{Style.RESET_ALL}")
-                                else:
-                                    print(f"{Fore.YELLOW}⚠️ Tên miền rác đã bị danh sách đen: {domain}，đang tìm tền miền khác...{Style.RESET_ALL}")
-                                # create email again
-                                time.sleep(1)
-                                return self.create_email()
-                            
+                        if is_blocked:
                             if self.translator:
-                                print(f"{Fore.GREEN}✅ {self.translator.get('email.create_success')}: {email}{Style.RESET_ALL}")
+                                print(f"{Fore.YELLOW}⚠️ {self.translator.get('email.domain_blocked')}: {domain}{Style.RESET_ALL}")
                             else:
-                                print(f"{Fore.GREEN}✅ 创建邮箱成功: {email}{Style.RESET_ALL}")
-                            return email
+                                print(f"{Fore.YELLOW}⚠️ Tên miền rác đã bị danh sách đen: {domain}，đang tìm tền miền khác...{Style.RESET_ALL}")
+                            # create email again
+                            time.sleep(1)
+                            return self.create_email()
+                        
+                        if self.translator:
+                            print(f"{Fore.GREEN}✅ {self.translator.get('email.create_success')}: {email}{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.GREEN}✅ 创建邮箱成功: {email}{Style.RESET_ALL}")
+                        return email
             if self.translator:
                 print(f"{Fore.RED}❌ {self.translator.get('email.create_failed')}{Style.RESET_ALL}")
             else:
