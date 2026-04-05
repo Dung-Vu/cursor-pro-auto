@@ -293,19 +293,27 @@ class NewTempEmail:
             return False
 
     def check_for_cursor_email(self):
-        """检查是否有 Cursor 的验证邮件"""
+        """Kiểm tra hộp thư xem có mail Cursor không"""
         try:
-            # find verification email - use more accurate selector
-            email_div = self.page.ele('xpath://div[contains(@class, "p-2") and contains(@class, "cursor-pointer") and contains(@class, "bg-white") and contains(@class, "shadow") and .//b[text()="no-reply@cursor.sh"] and .//span[text()="Verify your email address"]]')
-            if email_div:
+            # find verification email using robust text matching
+            email_ele = self.page.ele('text:Verify your email address')
+            if not email_ele:
+                email_ele = self.page.ele('text:Cursor')
+                
+            if email_ele:
                 if self.translator:
                     print(f"{Fore.GREEN}✅ {self.translator.get('email.verification_found')}{Style.RESET_ALL}")
                 else:
                     print(f"{Fore.GREEN}✅ 找到验证邮件{Style.RESET_ALL}")
-                # use JavaScript to click element
-                self.page.run_js('arguments[0].click()', email_div)
-                time.sleep(2)  # wait for email content to load
+                    
+                # Click the element or its parent
+                try:
+                    email_ele.click()
+                except:
+                    self.page.run_js('arguments[0].click()', email_ele)
+                time.sleep(3)  # wait for email content to load fully
                 return True
+                
             if self.translator:
                 print(f"{Fore.YELLOW}⚠️ {self.translator.get('email.verification_not_found')}{Style.RESET_ALL}")
             else:
@@ -320,9 +328,9 @@ class NewTempEmail:
             return False
 
     def get_verification_code(self):
-        """获取验证码"""
+        """Trích xuất mã xác minh 6 số"""
         try:
-            # find verification code element
+            # 1. Try finding it by Cursor's specific inline style
             code_element = self.page.ele('xpath://td//div[contains(@style, "font-size:28px") and contains(@style, "letter-spacing:2px")]')
             if code_element:
                 code = code_element.text.strip()
@@ -332,6 +340,19 @@ class NewTempEmail:
                     else:
                         print(f"{Fore.GREEN}✅ 获取验证码成功: {code}{Style.RESET_ALL}")
                     return code
+            
+            # 2. Fallback: Use Regex to scrape ANY 6-digit standalone number from the entire page text!
+            import re
+            page_text = self.page.ele('xpath://body').text if self.page.ele('xpath://body') else self.page.html
+            match = re.search(r'\b(\d{6})\b', page_text)
+            if match:
+                code = match.group(1)
+                if self.translator:
+                    print(f"{Fore.GREEN}✅ {self.translator.get('email.verification_code_found')}: {code}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.GREEN}✅ 获取验证码成功: {code}{Style.RESET_ALL}")
+                return code
+                
             if self.translator:
                 print(f"{Fore.YELLOW}⚠️ {self.translator.get('email.verification_code_not_found')}{Style.RESET_ALL}")
             else:
