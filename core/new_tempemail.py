@@ -208,9 +208,11 @@ class NewTempEmail:
                     emails = set(re.findall(r'[a-zA-Z0-9_.+-]+@(?:outlook\.com|gmail\.com|hotmail\.com|outlook\.[a-z.]+)', page_text))
                     
                     email = None
-                    ignore_list = ['support', 'smailpro', 'william@gmail.com', 'random', 'example', 'test']
+                    ignore_list = ['support', 'smailpro', 'william', 'random', 'example', 'test', 'admin', 'contact']
                     for e in emails:
-                        is_ignored = any(ignored in e.lower() for ignored in ignore_list)
+                        # Smailpro tries to evade scrapers by adding dots, e.g. w.i.l.l.i.a.m
+                        e_clean = e.lower().replace('.', '')
+                        is_ignored = any(ignored in e_clean for ignored in ignore_list)
                         if not is_ignored:
                             email = e
                             break
