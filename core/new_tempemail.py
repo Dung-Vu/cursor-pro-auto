@@ -174,27 +174,36 @@ class NewTempEmail:
             self.blocked_domains = self.get_blocked_domains()
             
             # visit website
-            self.page.get("https://smailpro.com/")
-            time.sleep(2)
+            self.page.get("https://smailpro.com/temporary-email")
+            time.sleep(3)
             
-            # click create email button
-            create_button = self.page.ele('xpath://button[@title="Create temporary email"]')
-            if create_button:
-                create_button.click()
-                time.sleep(1)
+            # Click 'Create' button to open modal
+            create_btn = self.page.ele('xpath://button[contains(., "Create")]')
+            if create_btn:
+                create_btn.click()
+                time.sleep(2)
                 
-                # click Create button in popup
-                modal_create_button = self.page.ele('xpath://button[contains(text(), "Create")]')
-                if modal_create_button:
-                    modal_create_button.click()
-                    time.sleep(2)
+                # Click 'Microsoft' email type
+                ms_btn = self.page.ele('xpath://div[contains(text(), "Microsoft")]/parent::button')
+                if not ms_btn: # Try alternative xpath
+                    ms_btn = self.page.ele('xpath://span[text()="Microsoft"]/parent::button')
                     
-                    # get email address - modify selector
-                    email_div = self.page.ele('xpath://div[@class="text-base sm:text-lg md:text-xl text-gray-700"]')
+                if ms_btn:
+                    ms_btn.click()
+                    time.sleep(1)
+                    
+                # Click 'Generate' button
+                generate_btn = self.page.ele('xpath://button[contains(., "Generate")]')
+                if generate_btn:
+                    generate_btn.click()
+                    time.sleep(4)
+                    
+                    # Get email address
+                    email_div = self.page.ele('xpath://div[contains(@class, "text-base") and contains(@class, "sm:text-lg")]')
                     if email_div:
                         email = email_div.text.strip()
-                        if '@' in email:  # check if it's a valid email address
-                            # check if domain is blocked
+                        if '@' in email:
+                            # Also check legacy domains just in case
                             domain = email.split('@')[1]
                             is_blocked = False
                             if self.blocked_domains:
