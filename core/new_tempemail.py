@@ -198,14 +198,21 @@ class NewTempEmail:
                     generate_btn.click()
                     time.sleep(4)
                     
-                    # Get email address
-                    email_div = self.page.ele('xpath://div[contains(@class, "text-base") and contains(@class, "sm:text-lg")]')
-                    if email_div:
-                        email = email_div.text.strip()
-                        if '@' in email:
-                            # Also check legacy domains just in case
-                            domain = email.split('@')[1]
-                            is_blocked = False
+                    # Get email address explicitly from page source via regex
+                    import re
+                    page_text = self.page.html
+                    # Find all emails in the HTML
+                    emails = set(re.findall(r'[a-zA-Z0-9_.+-]+@(?:outlook\.com|gmail\.com|hotmail\.com|outlook\.[a-z.]+)', page_text))
+                    
+                    email = None
+                    for e in emails:
+                        if "support" not in e.lower() and "smailpro" not in e.lower():
+                            email = e
+                            break
+                            
+                    if email:
+                        domain = email.split('@')[1]
+                        is_blocked = False
                             if self.blocked_domains:
                                 for blocked in self.blocked_domains:
                                     if domain == blocked or domain.endswith('.' + blocked):
