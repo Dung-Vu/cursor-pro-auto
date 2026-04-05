@@ -197,6 +197,10 @@ def setup_driver(translator=None):
         # Set browser options
         co = ChromiumOptions()
         
+        import tempfile
+        temp_profile = os.path.join(tempfile.gettempdir(), f"dp_signup_{random.randint(1000, 9999)}")
+        co.set_user_data_path(temp_profile)
+
         # Set Chrome path
         co.set_browser_path(chrome_path)
         

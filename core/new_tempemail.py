@@ -107,10 +107,14 @@ class NewTempEmail:
             # 创建浏览器选项
             co = ChromiumOptions()
             
-            # Only use headless for non-OAuth operations
-            if not hasattr(self, 'auth_type') or self.auth_type != 'oauth':
-                co.set_argument("--headless=new")
+            # Isolated profile to avoid 404 handshake conflict with user's open Chrome
+            import tempfile
+            temp_profile = os.path.join(tempfile.gettempdir(), f"dp_temp_mail_{random.randint(1000, 9999)}")
+            co.set_user_data_path(temp_profile)
 
+            # Show the browser to avoid headless extension crash
+            co.headless(False)
+            
             if sys.platform == "linux":
                 # Check if DISPLAY is set when not in headless mode
                 if not co.arguments.get("--headless=new") and not os.environ.get('DISPLAY'):
