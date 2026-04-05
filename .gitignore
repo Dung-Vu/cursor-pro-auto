@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+cursor_accounts.txt
+.cursor_ids.json
+.cursor_hook.js
+*.bak
+*.old
