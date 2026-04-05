@@ -511,7 +511,9 @@ def handle_verification_code(browser_tab, email_tab, controller, config, transla
                         print(f"{Fore.RED}❌ {translator.get('register.verification_timeout')}{Style.RESET_ALL}")
                     break
                     
-                verification_code = controller.get_verification_code()
+                if email_tab.check_for_cursor_email():
+                    verification_code = email_tab.get_verification_code()
+                
                 if verification_code:
                     if translator:
                         print(f"{Fore.GREEN}✅ {translator.get('register.verification_success')}{Style.RESET_ALL}")
