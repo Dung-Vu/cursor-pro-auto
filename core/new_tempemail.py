@@ -200,13 +200,18 @@ class NewTempEmail:
                     
                     # Get email address explicitly from page source via regex
                     import re
-                    page_text = self.page.html
+                    # Only search within VISIBLE text to avoid hidden HTML placeholders like "william@gmail.com"
+                    body_ele = self.page.ele('xpath://body')
+                    page_text = body_ele.text if body_ele else self.page.html
+                    
                     # Find all emails in the HTML
                     emails = set(re.findall(r'[a-zA-Z0-9_.+-]+@(?:outlook\.com|gmail\.com|hotmail\.com|outlook\.[a-z.]+)', page_text))
                     
                     email = None
+                    ignore_list = ['support', 'smailpro', 'william@gmail.com', 'random', 'example', 'test']
                     for e in emails:
-                        if "support" not in e.lower() and "smailpro" not in e.lower():
+                        is_ignored = any(ignored in e.lower() for ignored in ignore_list)
+                        if not is_ignored:
                             email = e
                             break
                             
